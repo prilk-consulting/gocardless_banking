@@ -1,0 +1,123 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-03-23 00:40:20.749356",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "activation_section",
+  "enabled",
+  "column_break_dpou",
+  "automatic_sync",
+  "section_break_ztwf",
+  "secret_id",
+  "secret_key",
+  "column_break_ykbg",
+  "access_key",
+  "refresh_key",
+  "access_expiry",
+  "refresh_expiry",
+  "section_break_jtqs",
+  "redirect_url"
+ ],
+ "fields": [
+  {
+   "fieldname": "activation_section",
+   "fieldtype": "Section Break",
+   "label": "Activation"
+  },
+  {
+   "default": "0",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Is enabled"
+  },
+  {
+   "fieldname": "column_break_dpou",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "automatic_sync",
+   "fieldtype": "Check",
+   "label": "Automatic Sync"
+  },
+  {
+   "fieldname": "section_break_ztwf",
+   "fieldtype": "Section Break",
+   "label": "Keys",
+   "mandatory_depends_on": "enabled"
+  },
+  {
+   "fieldname": "secret_id",
+   "fieldtype": "Data",
+   "label": "Secret ID"
+  },
+  {
+   "fieldname": "secret_key",
+   "fieldtype": "Data",
+   "label": "Secret Key"
+  },
+  {
+   "fieldname": "column_break_ykbg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "access_key",
+   "fieldtype": "Data",
+   "label": "Access Key",
+   "length": 500
+  },
+  {
+   "fieldname": "refresh_key",
+   "fieldtype": "Data",
+   "label": "Refresh Key",
+   "length": 500
+  },
+  {
+   "fieldname": "access_expiry",
+   "fieldtype": "Datetime",
+   "label": "Access Expiry"
+  },
+  {
+   "fieldname": "refresh_expiry",
+   "fieldtype": "Datetime",
+   "label": "Refresh Expiry"
+  },
+  {
+   "fieldname": "section_break_jtqs",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "redirect_url",
+   "fieldtype": "Data",
+   "label": "Redirect Url"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-03-23 00:40:20.749356",
+ "modified_by": "Administrator",
+ "module": "GoCardless Banking",
+ "name": "GoCardless Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "secret_id"
+}

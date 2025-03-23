@@ -1,0 +1,107 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-03-22 23:31:37.722447",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "agrement_section",
+  "agreement_id",
+  "company",
+  "gocardless_settings",
+  "column_break_vnuo",
+  "bank_name",
+  "bank_id",
+  "requisition_section",
+  "requisition_id",
+  "requisition_link",
+  "authentication_status"
+ ],
+ "fields": [
+  {
+   "fieldname": "agrement_section",
+   "fieldtype": "Section Break",
+   "label": "Agrement"
+  },
+  {
+   "fieldname": "agreement_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Agreement ID"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "column_break_vnuo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "bank_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Bank Name"
+  },
+  {
+   "fieldname": "bank_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Bank ID"
+  },
+  {
+   "fieldname": "requisition_section",
+   "fieldtype": "Section Break",
+   "label": "Requisition"
+  },
+  {
+   "fieldname": "requisition_id",
+   "fieldtype": "Data",
+   "label": "Requisition ID"
+  },
+  {
+   "fieldname": "requisition_link",
+   "fieldtype": "Data",
+   "label": "Requisition Link"
+  },
+  {
+   "fieldname": "authentication_status",
+   "fieldtype": "Select",
+   "label": "Authentication Status",
+   "options": "\nPending\nAuthenticated\nFailed"
+  },
+  {
+   "fieldname": "gocardless_settings",
+   "fieldtype": "Link",
+   "label": "GoCardless Settings",
+   "options": "GoCardless Settings"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-03-23 01:02:31.028227",
+ "modified_by": "Administrator",
+ "module": "GoCardless Banking",
+ "name": "GoCardless Agreement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
