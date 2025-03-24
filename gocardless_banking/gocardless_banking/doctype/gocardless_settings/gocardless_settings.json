@@ -95,8 +95,13 @@
   }
  ],
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2025-03-23 00:40:20.749356",
+ "links": [
+  {
+   "link_doctype": "GoCardless Agreement",
+   "link_fieldname": "gocardless_settings"
+  }
+ ],
+ "modified": "2025-03-23 21:47:17.775363",
  "modified_by": "Administrator",
  "module": "GoCardless Banking",
  "name": "GoCardless Settings",

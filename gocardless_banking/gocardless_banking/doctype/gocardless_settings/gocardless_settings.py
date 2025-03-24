@@ -17,6 +17,7 @@ class GoCardlessSettings(Document):
 import frappe
 from frappe.model.document import Document
 import frappe.utils
+from frappe.utils import add_days, get_datetime
 from frappe import _
 # from gocardless import gocardlessClient
 import requests
@@ -130,38 +131,55 @@ def create_gocardless_agreement(gocardless_settings_name,institution_id,bank_nam
         agreement_data = response.json()  
         update_gocardless_agreement(
             gocardless_settings = gocardless_settings,
-            institution_id = agreement_data.get("institution_id"),
             bank_name = bank_name,
-            agreement_id = agreement_data.get("id")
+            agreement_data=agreement_data
         )
         # Return a success message
         return {"message": "Agreement successfully created."}
     else:
         frappe.throw(f"Failed to create agreement. Status Code: {response.status_code}, Response: {response.text}")
 
-def update_gocardless_agreement(gocardless_settings,institution_id,bank_name,agreement_id):
+def update_gocardless_agreement(gocardless_settings, bank_name, agreement_data):
     # Fetch the parent document (GoCardless Settings)
     # gocardless_settings = frappe.get_doc("GoCardless Settings", gocardless_settings)
 
     agreement_exist = frappe.db.get_value(
         "GoCardless Agreement",
-        {"bank_id": institution_id},
+        {"bank_id": agreement_data.get("institution_id")},
         "name"
     )
     
+    # Parse datetime values, remove timezone and microseconds
+    created_on = get_datetime(agreement_data.get("created")).replace(tzinfo=None, microsecond=0)
+    accepted_on = get_datetime(agreement_data.get("accepted")).replace(tzinfo=None, microsecond=0)
+    access_expires_on = add_days(
+        get_datetime(agreement_data.get("created")), 
+        int(agreement_data.get("access_valid_for_days"))
+    ).replace(tzinfo=None, microsecond=0)
+    
     if agreement_exist:
         agreement_doc = frappe.get_doc("GoCardless Agreement", agreement_exist)
-        agreement_doc.agreement_id = agreement_id
+        agreement_doc.agreement_id = agreement_data.get("id")
+        agreement_doc.max_historical_days = agreement_data.get("max_historical_days")
+        agreement_doc.access_validity_days = agreement_data.get("access_valid_for_days")
+        agreement_doc.created_on = created_on
+        agreement_doc.accepted_on = accepted_on
+        agreement_doc.expires_on = access_expires_on
         agreement_doc.save()
         message = "GoCardless Agreement updated successfully"    
     else:
     # If no agreement exists, create a new one
         agreement_doc = frappe.get_doc({
             "doctype": "GoCardless Agreement",
-            "bank_id": institution_id,
+            "bank_id": agreement_data.get("institution_id"),
             "bank_name": bank_name,
-            "agreement_id": agreement_id,
-            "gocardless_settings": gocardless_settings.name
+            "agreement_id": agreement_data.get("id"),
+            "gocardless_settings": gocardless_settings.name,
+            "max_historical_days": agreement_data.get("max_historical_days"),
+            "access_validity_days": agreement_data.get("access_valid_for_days"),
+            "created_on": frappe.utils.get_datetime(agreement_data.get("created")),
+            "accepted_on": accepted_on,
+            "expires_on": access_expires_on,
         })
         agreement_doc.insert()
         message = "GoCardless Agreement created successfully"

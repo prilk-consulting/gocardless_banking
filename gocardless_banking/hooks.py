@@ -166,6 +166,15 @@ app_license = "mit"
 # 	],
 # }
 
+scheduler_events = {
+	"daily": [
+		"nordigen_integration.nordigen_integration.doctype.nordigen_account.nordigen_account.scheduled_fetch_transactions",
+  	 	"nordigen_integration.nordigen_integration.doctype.nordigen_settings.nordigen_settings.scheduled_refresh_nordigen_keys"
+	],
+	# "hourly": [
+	# ],
+}
+
 # Testing
 # -------
 

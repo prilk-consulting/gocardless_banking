@@ -23,17 +23,20 @@ frappe.ui.form.on('GoCardless Settings', {
             get_gocardless_banks(frm);
         });
         // Add a button to generate keys if access_key is not available
-        // if (!frm.doc.access_key) {
+        if (!frm.doc.access_key) {
             frm.add_custom_button(__('Generate Keys'), function() {
                 generate_gocardless_keys(frm);
             });
-        // }
+        };
         // Add a button to refresh keys if access_key is available
         if (frm.doc.access_key) {
             frm.add_custom_button(__('Refresh Keys'), function() {
                 refresh_gocardless_keys(frm);
             });
         }
+        // frm.add_custom_button(__('Connect Bank Account'), function() {
+        //     connect_bank_account(frm);
+        // });
     },
 });
 

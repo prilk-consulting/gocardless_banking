@@ -12,6 +12,11 @@
   "column_break_vnuo",
   "bank_name",
   "bank_id",
+  "max_historical_days",
+  "access_validity_days",
+  "created_on",
+  "accepted_on",
+  "expires_on",
   "requisition_section",
   "requisition_id",
   "requisition_link",
@@ -78,11 +83,41 @@
    "fieldtype": "Link",
    "label": "GoCardless Settings",
    "options": "GoCardless Settings"
+  },
+  {
+   "fieldname": "max_historical_days",
+   "fieldtype": "Int",
+   "label": "Max Historical Days"
+  },
+  {
+   "fieldname": "access_validity_days",
+   "fieldtype": "Int",
+   "label": "Access validity Days"
+  },
+  {
+   "fieldname": "created_on",
+   "fieldtype": "Datetime",
+   "label": "Created On"
+  },
+  {
+   "fieldname": "accepted_on",
+   "fieldtype": "Datetime",
+   "label": "Accepted On"
+  },
+  {
+   "fieldname": "expires_on",
+   "fieldtype": "Datetime",
+   "label": "Expires On"
   }
  ],
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2025-03-23 01:02:31.028227",
+ "links": [
+  {
+   "link_doctype": "GoCardless Account",
+   "link_fieldname": "gocardless_agreement"
+  }
+ ],
+ "modified": "2025-03-23 21:50:30.258028",
  "modified_by": "Administrator",
  "module": "GoCardless Banking",
  "name": "GoCardless Agreement",
