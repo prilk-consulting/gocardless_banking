@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestGoCardlessSettings(FrappeTestCase):
+class TestGoCardlessBankingAccount(FrappeTestCase):
 	pass

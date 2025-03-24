@@ -2,17 +2,6 @@
 # For license information, please see license.txt
 
 # import frappe
-from frappe.model.document import Document
-
-
-class GoCardlessSettings(Document):
-	pass
-
-
-
-
-
-
 
 import frappe
 from frappe.model.document import Document
@@ -24,14 +13,14 @@ import requests
 # from frappe.website.website_generator import WebsiteGenerator
 import json
 from frappe.utils import getdate, add_days
-class gocardlessSettings(Document):
+class GoCardlessBankingSettings(Document):
 	pass
 
 @frappe.whitelist()
-def generate_gocardless_keys(gocardless_settings_name):
-    gocardless_settings = frappe.get_doc("GoCardless Settings",gocardless_settings_name)
-    secret_id = gocardless_settings.secret_id
-    secret_key = gocardless_settings.secret_key
+def generate_gocardless_keys(gocardless_banking_settings_name):
+    gocardless_banking_settings = frappe.get_doc("GoCardless Banking Settings",gocardless_banking_settings_name)
+    secret_id = gocardless_banking_settings.secret_id
+    secret_key = gocardless_banking_settings.secret_key
     headers = { 'accept': 'application/json'}
     data = { "secret_id": secret_id,"secret_key": secret_key}
     api_url = "https://bankaccountdata.gocardless.com/api/v2/token/new/"
@@ -49,27 +38,27 @@ def generate_gocardless_keys(gocardless_settings_name):
     access_expiry_date = frappe.utils.add_days(frappe.utils.get_datetime(), access_expires // 86400)  # converting seconds to days
     refresh_expiry_date = frappe.utils.add_days(frappe.utils.get_datetime(), refresh_expires // 86400)  # converting seconds to days
 
-    gocardless_settings.access_key = access_key
-    gocardless_settings.refresh_key = refresh_key
-    gocardless_settings.access_expiry = access_expiry_date,
-    gocardless_settings.refresh_expiry = refresh_expiry_date
-    gocardless_settings.save()
+    gocardless_banking_settings.access_key = access_key
+    gocardless_banking_settings.refresh_key = refresh_key
+    gocardless_banking_settings.access_expiry = access_expiry_date,
+    gocardless_banking_settings.refresh_expiry = refresh_expiry_date
+    gocardless_banking_settings.save()
 
 
 @frappe.whitelist()
-def get_gocardless_banks(gocardless_settings):
+def get_gocardless_banks(gocardless_banking_settings):
     # Fetch GoCardless Settings document
-    gocardless_settings = frappe.get_doc("GoCardless Settings", gocardless_settings)
+    gocardless_banking_settings = frappe.get_doc("GoCardless Banking Settings", gocardless_banking_settings)
     # Get list of company names
     company_names= frappe.db.get_list('Company', pluck='company_name')
     # Set headers for API request
     headers = {
         'accept': 'application/json',
-        'Authorization':"Bearer {}".format(gocardless_settings.access_key) 
+        'Authorization':"Bearer {}".format(gocardless_banking_settings.access_key) 
         }
     # Set parameters for API request
     params = {
-        # 'country': gocardless_settings.country
+        # 'country': gocardless_banking_settings.country
         }
     # Define API URL for fetching institutions
     api_url = "https://bankaccountdata.gocardless.com/api/v2/institutions/"
@@ -107,13 +96,13 @@ def get_gocardless_banks(gocardless_settings):
         return banks_info, company_names
 
 @frappe.whitelist()
-def create_gocardless_agreement(gocardless_settings_name,institution_id,bank_name, max_historical_days, access_valid_for_days, access_scope):
-    gocardless_settings = frappe.get_doc("GoCardless Settings",gocardless_settings_name)
+def create_gocardless_banking_agreement(gocardless_banking_settings_name,institution_id,bank_name, max_historical_days, access_valid_for_days, access_scope):
+    gocardless_banking_settings = frappe.get_doc("GoCardless Banking Settings",gocardless_banking_settings_name)
 
     headers = {
         'accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': f"Bearer {gocardless_settings.access_key}"
+        'Authorization': f"Bearer {gocardless_banking_settings.access_key}"
     }
     data = {
         "institution_id": institution_id,
@@ -129,8 +118,8 @@ def create_gocardless_agreement(gocardless_settings_name,institution_id,bank_nam
     if response.status_code == 201:
         # Parse the response to get the agreement data
         agreement_data = response.json()  
-        update_gocardless_agreement(
-            gocardless_settings = gocardless_settings,
+        update_gocardless_banking_agreement(
+            gocardless_banking_settings = gocardless_banking_settings,
             bank_name = bank_name,
             agreement_data=agreement_data
         )
@@ -139,12 +128,12 @@ def create_gocardless_agreement(gocardless_settings_name,institution_id,bank_nam
     else:
         frappe.throw(f"Failed to create agreement. Status Code: {response.status_code}, Response: {response.text}")
 
-def update_gocardless_agreement(gocardless_settings, bank_name, agreement_data):
+def update_gocardless_banking_agreement(gocardless_banking_settings, bank_name, agreement_data):
     # Fetch the parent document (GoCardless Settings)
-    # gocardless_settings = frappe.get_doc("GoCardless Settings", gocardless_settings)
+    # gocardless_banking_settings = frappe.get_doc("GoCardless Settings", gocardless_banking_settings)
 
     agreement_exist = frappe.db.get_value(
-        "GoCardless Agreement",
+        "GoCardless Banking Agreement",
         {"bank_id": agreement_data.get("institution_id")},
         "name"
     )
@@ -158,7 +147,7 @@ def update_gocardless_agreement(gocardless_settings, bank_name, agreement_data):
     ).replace(tzinfo=None, microsecond=0)
     
     if agreement_exist:
-        agreement_doc = frappe.get_doc("GoCardless Agreement", agreement_exist)
+        agreement_doc = frappe.get_doc("GoCardless Banking Agreement", agreement_exist)
         agreement_doc.agreement_id = agreement_data.get("id")
         agreement_doc.max_historical_days = agreement_data.get("max_historical_days")
         agreement_doc.access_validity_days = agreement_data.get("access_valid_for_days")
@@ -166,32 +155,32 @@ def update_gocardless_agreement(gocardless_settings, bank_name, agreement_data):
         agreement_doc.accepted_on = accepted_on
         agreement_doc.expires_on = access_expires_on
         agreement_doc.save()
-        message = "GoCardless Agreement updated successfully"    
+        message = "GoCardless Banking Agreement updated successfully"    
     else:
     # If no agreement exists, create a new one
         agreement_doc = frappe.get_doc({
-            "doctype": "GoCardless Agreement",
+            "doctype": "GoCardless Banking Agreement",
             "bank_id": agreement_data.get("institution_id"),
             "bank_name": bank_name,
             "agreement_id": agreement_data.get("id"),
-            "gocardless_settings": gocardless_settings.name,
+            "gocardless_banking_settings": gocardless_banking_settings.name,
             "max_historical_days": agreement_data.get("max_historical_days"),
             "access_validity_days": agreement_data.get("access_valid_for_days"),
-            "created_on": frappe.utils.get_datetime(agreement_data.get("created")),
+            "created_on": created_on,
             "accepted_on": accepted_on,
             "expires_on": access_expires_on,
         })
         agreement_doc.insert()
-        message = "GoCardless Agreement created successfully"
+        message = "GoCardless Banking Agreement created successfully"
 
     return {"message": message}
 
 
 @frappe.whitelist()
-def refresh_gocardless_keys(gocardless_settings_name):
-    gocardless_settings = frappe.get_doc("GoCardless Settings", gocardless_settings_name)
+def refresh_gocardless_keys(gocardless_banking_settings_name):
+    gocardless_banking_settings = frappe.get_doc("GoCardless Banking Settings", gocardless_banking_settings_name)
     # Check if the access key has expired
-    if frappe.utils.get_datetime() >= gocardless_settings.access_expiry:
+    if frappe.utils.get_datetime() >= gocardless_banking_settings.access_expiry:
         # Use refresh token to get new keys
         url = "https://bankaccountdata.gocardless.com/api/v2/token/refresh/"
         headers = {
@@ -199,7 +188,7 @@ def refresh_gocardless_keys(gocardless_settings_name):
             "Content-Type": "application/json"
         }
         data = {
-            "refresh": gocardless_settings.refresh_key
+            "refresh": gocardless_banking_settings.refresh_key
         }
         response = requests.post(url, headers=headers, data=json.dumps(data))
         
@@ -214,11 +203,11 @@ def refresh_gocardless_keys(gocardless_settings_name):
         new_access_expiry_date = frappe.utils.add_days(frappe.utils.getdate(), new_access_expires // 86400)  # convert seconds to days
 
         # Update the GoCardless Settings with new keys and expiry times
-        gocardless_settings.access_key = new_access_key
-        gocardless_settings.access_expiry = new_access_expiry_date
-        gocardless_settings.save()
+        gocardless_banking_settings.access_key = new_access_key
+        gocardless_banking_settings.access_expiry = new_access_expiry_date
+        gocardless_banking_settings.save()
 
-        frappe.msgprint(f"Keys refreshed successfully for {gocardless_settings_name}.")
+        frappe.msgprint(f"Keys refreshed successfully for {gocardless_banking_settings_name}.")
     
 @frappe.whitelist()
 def scheduled_refresh_gocardless_keys():
@@ -226,14 +215,14 @@ def scheduled_refresh_gocardless_keys():
     Refresh gocardless access keys for all settings with expired keys.
     """
     # Fetch GoCardless Settings with expired access keys
-    gocardless_settings_list = frappe.get_all(
-        "GoCardless Settings",
+    gocardless_banking_settings_list = frappe.get_all(
+        "GoCardless Banking Settings",
         filters={"access_expiry": ("<=", frappe.utils.get_datetime())},
         pluck="name"
     )
-    for gocardless_settings in gocardless_settings_list:
+    for gocardless_banking_settings in gocardless_banking_settings_list:
         try:
-            refresh_gocardless_keys(gocardless_settings.name)
-            frappe.logger().info(f"Refreshed keys for: {gocardless_settings.name}")
+            refresh_gocardless_keys(gocardless_banking_settings.name)
+            frappe.logger().info(f"Refreshed keys for: {gocardless_banking_settings.name}")
         except Exception as e:
-            frappe.log_error(frappe.get_traceback(), f"Failed to refresh keys for: {gocardless_settings.name}")
+            frappe.log_error(frappe.get_traceback(), f"Failed to refresh keys for: {gocardless_banking_settings.name}")

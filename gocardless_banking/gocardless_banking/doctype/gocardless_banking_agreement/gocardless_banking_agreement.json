@@ -8,7 +8,7 @@
   "agrement_section",
   "agreement_id",
   "company",
-  "gocardless_settings",
+  "gocardless_banking_settings",
   "column_break_vnuo",
   "bank_name",
   "bank_id",
@@ -79,12 +79,6 @@
    "options": "\nPending\nAuthenticated\nFailed"
   },
   {
-   "fieldname": "gocardless_settings",
-   "fieldtype": "Link",
-   "label": "GoCardless Settings",
-   "options": "GoCardless Settings"
-  },
-  {
    "fieldname": "max_historical_days",
    "fieldtype": "Int",
    "label": "Max Historical Days"
@@ -108,19 +102,25 @@
    "fieldname": "expires_on",
    "fieldtype": "Datetime",
    "label": "Expires On"
+  },
+  {
+   "fieldname": "gocardless_banking_settings",
+   "fieldtype": "Link",
+   "label": "GoCardless Banking Settings",
+   "options": "GoCardless Banking Settings"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [
   {
-   "link_doctype": "GoCardless Account",
-   "link_fieldname": "gocardless_agreement"
+   "link_doctype": "GoCardless Banking Account",
+   "link_fieldname": "gocardless_banking_agreement"
   }
  ],
- "modified": "2025-03-23 21:50:30.258028",
+ "modified": "2025-03-24 10:10:29.733774",
  "modified_by": "Administrator",
  "module": "GoCardless Banking",
- "name": "GoCardless Agreement",
+ "name": "GoCardless Banking Agreement",
  "owner": "Administrator",
  "permissions": [
   {

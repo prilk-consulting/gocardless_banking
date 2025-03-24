@@ -168,8 +168,8 @@ app_license = "mit"
 
 scheduler_events = {
 	"daily": [
-		"nordigen_integration.nordigen_integration.doctype.nordigen_account.nordigen_account.scheduled_fetch_transactions",
-  	 	"nordigen_integration.nordigen_integration.doctype.nordigen_settings.nordigen_settings.scheduled_refresh_nordigen_keys"
+		"gocardless_banking.gocardless_banking.doctype.gocardless_banking_account.gocardless_banking_account.scheduled_fetch_transactions",
+  	 	"gocardless_banking.gocardless_banking.doctype.gocardless_banking_settings.gocardless_banking_settings.scheduled_refresh_gocardless_keys"
 	],
 	# "hourly": [
 	# ],

@@ -7,26 +7,26 @@ import requests
 import json
 
 
-class GoCardlessAccount(Document):
+class GoCardlessBankingAccount(Document):
 	pass
 
 @frappe.whitelist()
-def fetch_transactions(gocardless_account_name):
-    # Fetch the GoCardless Account details
-    gocardless_account = frappe.get_doc("GoCardless Account", gocardless_account_name)
-    gocardless_agreement = frappe.get_doc("GoCardless Agreement", gocardless_account.gocardless_agreement)
-    gocardless_settings = frappe.get_doc("GoCardless Settings", gocardless_agreement.gocardless_settings)
+def fetch_transactions(gocardless_banking_account_name):
+    # Fetch the GoCardless Banking Account details
+    gocardless_banking_account = frappe.get_doc("GoCardless Banking Account", gocardless_banking_account_name)
+    gocardless_banking_agreement = frappe.get_doc("GoCardless Banking Agreement", gocardless_banking_account.gocardless_banking_agreement)
+    gocardless_banking_settings = frappe.get_doc("GoCardless Banking Settings", gocardless_banking_agreement.gocardless_banking_settings)
 
-    if not gocardless_settings.access_key:
-        frappe.throw("Access token is missing for this GoCardless Account.")
+    if not gocardless_banking_settings.access_key:
+        frappe.throw("Access token is missing for this GoCardless Banking Account.")
 
-    if not gocardless_account.account_id:
-        frappe.throw("Account ID is missing for this GoCardless Account.")
+    if not gocardless_banking_account.account_id:
+        frappe.throw("Account ID is missing for this GoCardless Banking Account.")
 
     # API URL to fetch transactions
-    url = f"https://bankaccountdata.gocardless.com/api/v2/accounts/{gocardless_account.account_id}/transactions/"
+    url = f"https://bankaccountdata.gocardless.com/api/v2/accounts/{gocardless_banking_account.account_id}/transactions/"
     headers = {
-        "Authorization": f"Bearer {gocardless_settings.access_key}",
+        "Authorization": f"Bearer {gocardless_banking_settings.access_key}",
         "accept": "application/json",
     }
 
@@ -38,30 +38,30 @@ def fetch_transactions(gocardless_account_name):
 
         # Process transactions
         transactions = data.get("transactions", {})
-        create_bank_transactions(gocardless_account_name, transactions)
+        create_bank_transactions(gocardless_banking_account_name, transactions)
 
         # Update the last synced timestamp
-        gocardless_account.last_synced = frappe.utils.now()
-        gocardless_account.save()
+        gocardless_banking_account.last_synced = frappe.utils.now()
+        gocardless_banking_account.save()
 
-        return f"Transactions fetched and created for {gocardless_account_name}."
+        return f"Transactions fetched and created for {gocardless_banking_account_name}."
     except requests.exceptions.RequestException as e:
         frappe.log_error(message=str(e), title="Transaction Fetch Failed")
         frappe.throw(f"Failed to fetch transactions: {str(e)}")
 
-def create_bank_transactions(gocardless_account_name, transactions):
+def create_bank_transactions(gocardless_banking_account_name, transactions):
     # Create booked transactions
     for booked in transactions.get("booked", []):
-        create_transaction(gocardless_account_name, booked, transaction_type="Booked")
+        create_transaction(gocardless_banking_account_name, booked, transaction_type="Booked")
 
     # Create pending transactions
     for pending in transactions.get("pending", []):
-        create_transaction(gocardless_account_name, pending, transaction_type="Pending")
+        create_transaction(gocardless_banking_account_name, pending, transaction_type="Pending")
 
 
-def create_transaction(gocardless_account_name, transaction_data, transaction_type):
-    # Fetch the GoCardless Account document
-    gocardless_account = frappe.get_doc("GoCardless Account", gocardless_account_name)
+def create_transaction(gocardless_banking_account_name, transaction_data, transaction_type):
+    # Fetch the GoCardless Banking Account document
+    gocardless_banking_account = frappe.get_doc("GoCardless Banking Account", gocardless_banking_account_name)
     # Check if a Bank Transaction with this transactionId already exists
     transaction_id = transaction_data.get("transactionId")
     if transaction_id and frappe.get_value("Bank Transaction", {"transaction_id": transaction_id}, "name"):
@@ -73,7 +73,7 @@ def create_transaction(gocardless_account_name, transaction_data, transaction_ty
     bank_transaction = frappe.new_doc("Bank Transaction")
     
     # Assign values to the transaction fields
-    bank_transaction.bank_account = gocardless_account.bank_account
+    bank_transaction.bank_account = gocardless_banking_account.bank_account
     bank_transaction.transaction_id = transaction_data.get("transactionId")
     # bank_transaction.debtor_name = transaction_data.get("debtorName")
 
@@ -111,6 +111,6 @@ def create_transaction(gocardless_account_name, transaction_data, transaction_ty
     bank_transaction.insert()
 
 def scheduled_fetch_transactions():
-    gocardless_accounts = frappe.get_all("GoCardless Account", filters={"automatic_sync": 1}, fields=["name"])
-    for gocardless_account in gocardless_accounts:
-        fetch_transactions(gocardless_account.name)
+    gocardless_banking_accounts = frappe.get_all("GoCardless Banking Account", filters={"automatic_sync": 1}, fields=["name"])
+    for gocardless_banking_account in gocardless_banking_accounts:
+        fetch_transactions(gocardless_banking_account.name)

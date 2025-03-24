@@ -6,10 +6,11 @@
  "engine": "InnoDB",
  "field_order": [
   "account_id",
-  "gocardless_agreement",
+  "gocardless_banking_agreement",
   "bank_account",
   "last_synced",
-  "automatic_sync"
+  "automatic_sync",
+  "column_break_fjqy"
  ],
  "fields": [
   {
@@ -35,18 +36,22 @@
    "label": "Automatic Sync"
   },
   {
-   "fieldname": "gocardless_agreement",
+   "fieldname": "gocardless_banking_agreement",
    "fieldtype": "Link",
-   "label": "GoCardless Agreement",
-   "options": "GoCardless Agreement"
+   "label": "GoCardless Banking Agreement",
+   "options": "GoCardless Banking Agreement"
+  },
+  {
+   "fieldname": "column_break_fjqy",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-23 01:02:58.248041",
+ "modified": "2025-03-24 14:17:16.131311",
  "modified_by": "Administrator",
  "module": "GoCardless Banking",
- "name": "GoCardless Account",
+ "name": "GoCardless Banking Account",
  "owner": "Administrator",
  "permissions": [
   {
@@ -65,5 +70,5 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "gocardless_agreement"
+ "title_field": "gocardless_banking_agreement"
 }

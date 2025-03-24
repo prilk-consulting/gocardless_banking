@@ -3,14 +3,14 @@ from frappe.model.document import Document
 import frappe.utils
 import requests
 
-from gocardless_banking.gocardless_banking.doctype.gocardless_agreement.gocardless_agreement import check_auth_status
+from gocardless_banking.gocardless_banking.doctype.gocardless_banking_agreement.gocardless_banking_agreement import check_auth_status
 @frappe.whitelist(allow_guest=True)
 def handle_auth_redirect():
     """
     Handle gocardless's redirect after authentication and update the status.
     Sample     # Fetch the agreement using requisition_id
-    gocardless_agreement = frappe.get_all(
-        "GoCardless Agreement",
+    gocardless_banking_agreement = frappe.get_all(
+        "GoCardless Banking Agreement",
         filters={"requisition_id": requisition_id},
         fields=["name", "owner"]
     )
@@ -21,15 +21,15 @@ def handle_auth_redirect():
     error = frappe.form_dict.get("error")
     error_details = frappe.form_dict.get("details")
     # Fetch the agreement using requisition_id
-    gocardless_agreement = frappe.get_all(
-        "GoCardless Agreement",
+    gocardless_banking_agreement = frappe.get_all(
+        "GoCardless Banking Agreement",
         filters={"requisition_id": requisition_id},
         fields=["name", "owner"]
     )
-    if not gocardless_agreement:
+    if not gocardless_banking_agreement:
         frappe.throw(frappe._("No agreement found for the provided requisition ID."))
-    if gocardless_agreement:
-        gocardless_agreement_name = gocardless_agreement[0]["name"]
+    if gocardless_banking_agreement:
+        gocardless_banking_agreement_name = gocardless_banking_agreement[0]["name"]
     # Handle errors in the callback
     if error:
         frappe.log_error(
@@ -42,13 +42,13 @@ def handle_auth_redirect():
     elif not requisition_id:
         frappe.throw(frappe._("Missing requisition id in callback URL."))
     else:
-        result = check_auth_status(gocardless_agreement_name)
+        result = check_auth_status(gocardless_banking_agreement_name)
         if "Error" in result:
             frappe.throw(result)
             return result
         else:
             # Define the custom URL to redirect the user after authentication success
-            custom_redirect_url = f"{frappe.utils.get_url()}/app/gocardless-agreement/{gocardless_agreement_name}"
+            custom_redirect_url = f"{frappe.utils.get_url()}/app/gocardless-banking-agreement/{gocardless_banking_agreement_name}"
             # Redirect to the custom URL after authentication success
             frappe.local.response["type"] = "redirect"
             frappe.local.response["location"] = custom_redirect_url

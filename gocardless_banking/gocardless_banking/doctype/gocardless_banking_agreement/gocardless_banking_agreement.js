@@ -1,18 +1,18 @@
 // Copyright (c) 2025, Prilk Consulting BV and contributors
 // For license information, please see license.txt
 
-// frappe.ui.form.on("GoCardless Agreement", {
+// frappe.ui.form.on("GoCardless Banking Agreement", {
 // 	refresh(frm) {
 
 // 	},
 // });
 
-frappe.ui.form.on('GoCardless Agreement', {
+frappe.ui.form.on('GoCardless Banking Agreement', {
     refresh: function (frm) {
         // Add Create Requisition button
         frm.add_custom_button(__('Create Requisition'), function () {
             frappe.call({
-                method: "gocardless_banking.gocardless_banking.doctype.gocardless_agreement.gocardless_agreement.create_gocardless_requisition",
+                method: "gocardless_banking.gocardless_banking.doctype.gocardless_banking_agreement.gocardless_banking_agreement.create_gocardless_requisition",
                 args: {
                     agreement_name: frm.doc.name,
                     institution_id: frm.doc.bank_id,
@@ -68,15 +68,15 @@ frappe.ui.form.on('GoCardless Agreement', {
     }
 });
 
-frappe.ui.form.on('GoCardless Agreement', {
+frappe.ui.form.on('GoCardless Banking Agreement', {
     refresh: function (frm) {
         // Add Get accounts button if requisition_link is available
         if (frm.doc.requisition_link) {
             frm.add_custom_button(__('Get Accounts'), function () {
                 frappe.call({
-                    method: "gocardless_banking.gocardless_banking.doctype.gocardless_agreement.gocardless_agreement.get_gocardless_agreement_accounts",
+                    method: "gocardless_banking.gocardless_banking.doctype.gocardless_banking_agreement.gocardless_banking_agreement.get_gocardless_banking_agreement_accounts",
                     args: {
-                        gocardless_agreement_name: frm.doc.name,
+                        gocardless_banking_agreement_name: frm.doc.name,
                     },
                     callback: function (r) {
                         if (!r.exc) {

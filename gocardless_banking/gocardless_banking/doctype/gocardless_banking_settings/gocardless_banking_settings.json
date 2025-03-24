@@ -97,14 +97,14 @@
  "index_web_pages_for_search": 1,
  "links": [
   {
-   "link_doctype": "GoCardless Agreement",
-   "link_fieldname": "gocardless_settings"
+   "link_doctype": "GoCardless Banking Agreement",
+   "link_fieldname": "gocardless_banking_settings"
   }
  ],
- "modified": "2025-03-23 21:47:17.775363",
+ "modified": "2025-03-24 10:12:13.638145",
  "modified_by": "Administrator",
  "module": "GoCardless Banking",
- "name": "GoCardless Settings",
+ "name": "GoCardless Banking Settings",
  "owner": "Administrator",
  "permissions": [
   {

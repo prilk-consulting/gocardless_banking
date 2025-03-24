@@ -1,18 +1,13 @@
 // Copyright (c) 2025, Prilk Consulting BV and contributors
 // For license information, please see license.txt
 
-// frappe.ui.form.on("GoCardless Settings", {
+// frappe.ui.form.on("GoCardless Banking Settings", {
 // 	refresh(frm) {
 
 // 	},
 // });
 
-
-
-
-
-
-frappe.ui.form.on('GoCardless Settings', {
+frappe.ui.form.on('GoCardless Banking Settings', {
     // enabled: function (frm) {
     //     frm.toggle_reqd('secret_id', frm.doc.enabled);
     //     frm.toggle_reqd('secret_key', frm.doc.enabled);
@@ -42,9 +37,9 @@ frappe.ui.form.on('GoCardless Settings', {
 
 function get_gocardless_banks(frm) {
     frappe.call({
-        method: 'gocardless_banking.gocardless_banking.doctype.gocardless_settings.gocardless_settings.get_gocardless_banks',
+        method: 'gocardless_banking.gocardless_banking.doctype.gocardless_banking_settings.gocardless_banking_settings.get_gocardless_banks',
         args: {
-            gocardless_settings: frm.doc.name
+            gocardless_banking_settings: frm.doc.name
         },
         callback: function(r) {
             if (!r.exc && r.message) {
@@ -80,7 +75,7 @@ function get_gocardless_banks(frm) {
                             let selected_bank = banks.find(bank => bank.id === selected_option);
                             if (selected_bank) {
                                 console.log('Selected Bank:', selected_bank);
-                                create_gocardless_agreement(
+                                create_gocardless_banking_agreement(
                                     frm,
                                     institution_id = selected_bank.id,
                                     bank_name = selected_bank.name,
@@ -103,9 +98,9 @@ function get_gocardless_banks(frm) {
 
 function generate_gocardless_keys(frm) {
     frappe.call({
-        method: 'gocardless_banking.gocardless_banking.doctype.gocardless_settings.gocardless_settings.generate_gocardless_keys',
+        method: 'gocardless_banking.gocardless_banking.doctype.gocardless_banking_settings.gocardless_banking_settings.generate_gocardless_keys',
         args: {
-            gocardless_settings_name: frm.doc.name
+            gocardless_banking_settings_name: frm.doc.name
         },
         callback: function(r) {
             if (!r.exc) {
@@ -122,9 +117,9 @@ function generate_gocardless_keys(frm) {
 
 function refresh_gocardless_keys(frm) {
     frappe.call({
-        method: 'gocardless_banking.gocardless_banking.doctype.gocardless_settings.gocardless_settings.refresh_gocardless_keys',
+        method: 'gocardless_banking.gocardless_banking.doctype.gocardless_banking_settings.gocardless_banking_settings.refresh_gocardless_keys',
         args: {
-            gocardless_settings_name: frm.doc.name
+            gocardless_banking_settings_name: frm.doc.name
         },
         callback: function(r) {
             if (!r.exc) {
@@ -139,11 +134,11 @@ function refresh_gocardless_keys(frm) {
     });
 };
 
-function create_gocardless_agreement(frm,institution_id, bank_name) {
+function create_gocardless_banking_agreement(frm,institution_id, bank_name) {
     frappe.call({
-        method: 'gocardless_banking.gocardless_banking.doctype.gocardless_settings.gocardless_settings.create_gocardless_agreement',
+        method: 'gocardless_banking.gocardless_banking.doctype.gocardless_banking_settings.gocardless_banking_settings.create_gocardless_banking_agreement',
         args: {
-            gocardless_settings_name: frm.doc.name,
+            gocardless_banking_settings_name: frm.doc.name,
             institution_id: institution_id,
             bank_name: bank_name,
             max_historical_days: max_historical_days,
