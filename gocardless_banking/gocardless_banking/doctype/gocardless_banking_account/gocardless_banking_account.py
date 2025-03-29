@@ -101,7 +101,7 @@ def create_transaction(gocardless_banking_account_name, transaction_data, transa
 
     # Set other fields
     bank_transaction.currency = transaction_data["transactionAmount"]["currency"]
-    bank_transaction.date = transaction_data.get("valueDate")  # Use 'valueDate' for the date
+    bank_transaction.date = transaction_data.get("valueDate") or transaction_data.get("bookingDate")
     
     # Optional: Set the transaction type and description (if required)
     bank_transaction.transaction_type = transaction_type
