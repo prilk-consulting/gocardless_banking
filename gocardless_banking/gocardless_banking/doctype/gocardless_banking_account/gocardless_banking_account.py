@@ -3,6 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
+from frappe import utils
 import requests
 import json
 
@@ -30,9 +31,15 @@ def fetch_transactions(gocardless_banking_account_name):
         "accept": "application/json",
     }
 
+    # Add date_from parameter if last_synced is available
+    params = {}
+    if gocardless_banking_account.last_synced:
+        # Use frappe's date util to format the date string
+        params['date_from'] = frappe.utils.get_date_str(gocardless_banking_account.last_synced)
+
     try:
-        # Make the API request
-        response = requests.get(url, headers=headers)
+        # Make the API request with optional params
+        response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
         data = response.json()
 

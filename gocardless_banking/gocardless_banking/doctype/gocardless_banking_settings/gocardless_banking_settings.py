@@ -8,9 +8,7 @@ from frappe.model.document import Document
 import frappe.utils
 from frappe.utils import add_days, get_datetime
 from frappe import _
-# from gocardless import gocardlessClient
 import requests
-# from frappe.website.website_generator import WebsiteGenerator
 import json
 from frappe.utils import getdate, add_days
 class GoCardlessBankingSettings(Document):
@@ -207,22 +205,42 @@ def refresh_gocardless_keys(gocardless_banking_settings_name):
         gocardless_banking_settings.access_expiry = new_access_expiry_date
         gocardless_banking_settings.save()
 
-        frappe.msgprint(f"Keys refreshed successfully for {gocardless_banking_settings_name}.")
+        frappe.msgprint(f"Access Keys refreshed successfully for {gocardless_banking_settings_name}.")
     
 @frappe.whitelist()
 def scheduled_refresh_gocardless_keys():
     """
-    Refresh gocardless access keys for all settings with expired keys.
+    Refresh GoCardless access keys for all settings with expired access or refresh tokens.
     """
-    # Fetch GoCardless Settings with expired access keys
-    gocardless_banking_settings_list = frappe.get_all(
+    current_datetime = get_datetime()
+
+    # Fetch settings where either access_expiry or refresh_expiry is expired
+    settings_list = frappe.get_all(
         "GoCardless Banking Settings",
-        filters={"access_expiry": ("<=", frappe.utils.get_datetime())},
-        pluck="name"
+        filters=[
+            ["refresh_expiry", "not in", ["", None]],  # Ensure refresh_expiry is valid
+            ["access_expiry", "not in", ["", None]],   # Ensure access_expiry is valid
+            [
+                "or",  # Combine conditions with OR
+                [
+                    ["refresh_expiry", "<=", current_datetime],
+                    ["access_expiry", "<=", current_datetime]
+                ]
+            ]
+        ],
+        fields=["name", "access_expiry", "refresh_expiry"]
     )
-    for gocardless_banking_settings in gocardless_banking_settings_list:
+
+    for settings in settings_list:
         try:
-            refresh_gocardless_keys(gocardless_banking_settings.name)
-            frappe.logger().info(f"Refreshed keys for: {gocardless_banking_settings.name}")
+            if settings.refresh_expiry <= current_datetime:
+                generate_gocardless_keys(settings.name)
+                frappe.logger().info(f"Generated new keys for: {settings.name} (refresh token expired)")
+            elif settings.access_expiry <= current_datetime:
+                refresh_gocardless_keys(settings.name)
+                frappe.logger().info(f"Refreshed access key for: {settings.name}")
         except Exception as e:
-            frappe.log_error(frappe.get_traceback(), f"Failed to refresh keys for: {gocardless_banking_settings.name}")
+            frappe.log_error(
+                f"Error processing {settings.name}: {str(e)}",
+                title="GoCardless Key Refresh Error"
+            )
