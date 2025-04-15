@@ -214,21 +214,17 @@ def scheduled_refresh_gocardless_keys():
     """
     current_datetime = get_datetime()
 
-    # Fetch settings where either access_expiry or refresh_expiry is expired
+    # Fetch settings with valid refresh_expiry and access_expiry
     settings_list = frappe.get_all(
         "GoCardless Banking Settings",
         filters=[
             ["refresh_expiry", "not in", ["", None]],  # Ensure refresh_expiry is valid
             ["access_expiry", "not in", ["", None]],   # Ensure access_expiry is valid
-            [
-                ["refresh_expiry", "<=", current_datetime],
-                "or",
-                ["access_expiry", "<=", current_datetime]
-            ]
         ],
         fields=["name", "access_expiry", "refresh_expiry"]
     )
 
+    # Check expiration in Python
     for settings in settings_list:
         try:
             if settings.refresh_expiry <= current_datetime:
