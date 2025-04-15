@@ -221,11 +221,9 @@ def scheduled_refresh_gocardless_keys():
             ["refresh_expiry", "not in", ["", None]],  # Ensure refresh_expiry is valid
             ["access_expiry", "not in", ["", None]],   # Ensure access_expiry is valid
             [
-                "or",  # Combine conditions with OR
-                [
-                    ["refresh_expiry", "<=", current_datetime],
-                    ["access_expiry", "<=", current_datetime]
-                ]
+                ["refresh_expiry", "<=", current_datetime],
+                "or",
+                ["access_expiry", "<=", current_datetime]
             ]
         ],
         fields=["name", "access_expiry", "refresh_expiry"]
