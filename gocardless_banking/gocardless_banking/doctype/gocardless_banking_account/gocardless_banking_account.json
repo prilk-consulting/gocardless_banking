@@ -10,7 +10,8 @@
   "bank_account",
   "last_synced",
   "automatic_sync",
-  "column_break_fjqy"
+  "column_break_fjqy",
+  "account_details"
  ],
  "fields": [
   {
@@ -39,16 +40,22 @@
    "fieldname": "gocardless_banking_agreement",
    "fieldtype": "Link",
    "label": "GoCardless Banking Agreement",
-   "options": "GoCardless Banking Agreement"
+   "options": "GoCardless Banking Agreement",
+   "index": 1
   },
   {
    "fieldname": "column_break_fjqy",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "account_details",
+   "fieldtype": "Long Text",
+   "label": "Account Details"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-24 14:17:16.131311",
+ "modified": "2025-04-15 20:09:26.676559",
  "modified_by": "Administrator",
  "module": "GoCardless Banking",
  "name": "GoCardless Banking Account",

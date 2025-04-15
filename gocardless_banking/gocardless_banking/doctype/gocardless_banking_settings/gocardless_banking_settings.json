@@ -6,8 +6,6 @@
  "engine": "InnoDB",
  "field_order": [
   "activation_section",
-  "enabled",
-  "column_break_dpou",
   "automatic_sync",
   "section_break_ztwf",
   "secret_id",
@@ -25,16 +23,6 @@
    "fieldname": "activation_section",
    "fieldtype": "Section Break",
    "label": "Activation"
-  },
-  {
-   "default": "0",
-   "fieldname": "enabled",
-   "fieldtype": "Check",
-   "label": "Is enabled"
-  },
-  {
-   "fieldname": "column_break_dpou",
-   "fieldtype": "Column Break"
   },
   {
    "default": "0",
@@ -101,7 +89,7 @@
    "link_fieldname": "gocardless_banking_settings"
   }
  ],
- "modified": "2025-03-24 10:12:13.638145",
+ "modified": "2025-04-15 20:20:05.285797",
  "modified_by": "Administrator",
  "module": "GoCardless Banking",
  "name": "GoCardless Banking Settings",

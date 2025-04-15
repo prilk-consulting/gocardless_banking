@@ -12,6 +12,74 @@ class GoCardlessBankingAccount(Document):
 	pass
 
 @frappe.whitelist()
+def fetch_account_details(gocardless_banking_account_name):
+    """Fetch account details from GoCardless API and update the account document"""
+    try:
+        # Fetch the GoCardless Banking Account details
+        gocardless_banking_account = frappe.get_doc("GoCardless Banking Account", gocardless_banking_account_name)
+        gocardless_banking_agreement = frappe.get_doc("GoCardless Banking Agreement", gocardless_banking_account.gocardless_banking_agreement)
+        gocardless_banking_settings = frappe.get_doc("GoCardless Banking Settings", gocardless_banking_agreement.gocardless_banking_settings)
+
+        if not gocardless_banking_settings.access_key:
+            frappe.throw("Access token is missing for this GoCardless Banking Account.")
+
+        if not gocardless_banking_account.account_id:
+            frappe.throw("Account ID is missing for this GoCardless Banking Account.")
+
+        # API URL to fetch account details
+        url = f"https://bankaccountdata.gocardless.com/api/v2/accounts/{gocardless_banking_account.account_id}/"
+        headers = {
+            "Authorization": f"Bearer {gocardless_banking_settings.access_key}",
+            "accept": "application/json",
+        }
+
+        # Make the API request
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        account_data = response.json()
+        
+        # Fetch account balances
+        balance_url = f"https://bankaccountdata.gocardless.com/api/v2/accounts/{gocardless_banking_account.account_id}/balances/"
+        balance_response = requests.get(balance_url, headers=headers)
+        balance_response.raise_for_status()
+        balance_data = balance_response.json()
+        
+        # Combine all information into a single dictionary
+        all_details = {
+            "Account Details": {
+                "IBAN": account_data.get("iban"),
+                "BBAN": account_data.get("bban"),
+                "Status": account_data.get("status"),
+                "Institution ID": account_data.get("institution_id"),
+                "Owner Name": account_data.get("owner_name"),
+                "Account Name": account_data.get("name"),
+                "Created On": account_data.get("created"),
+                "Last Accessed": account_data.get("last_accessed"),
+                "Currency": account_data.get("account", {}).get("currency")
+            },
+            "Balance Information": balance_data.get("balances", [])
+        }
+        
+        # Convert to formatted JSON string
+        formatted_details = json.dumps(all_details, indent=4)
+        
+        # Update the account document with the formatted details
+        gocardless_banking_account.account_details = formatted_details
+        gocardless_banking_account.save()
+        
+        frappe.msgprint(f"Account details updated successfully for {gocardless_banking_account_name}")
+        return "Success"
+
+    except requests.exceptions.RequestException as e:
+        error_msg = f"Failed to fetch account details: {str(e)}"
+        if response and response.json():
+            error_details = response.json()
+            error_msg = f"{error_msg}\nDetails: {error_details.get('detail', '')}"
+        
+        frappe.log_error(message=error_msg, title="Account Details Fetch Failed")
+        frappe.throw(error_msg)
+
+@frappe.whitelist()
 def fetch_transactions(gocardless_banking_account_name):
     # Fetch the GoCardless Banking Account details
     gocardless_banking_account = frappe.get_doc("GoCardless Banking Account", gocardless_banking_account_name)

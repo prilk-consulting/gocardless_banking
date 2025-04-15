@@ -23,6 +23,23 @@ frappe.ui.form.on('GoCardless Banking Account', {
                 }
             });
         });
+
+        // Add Fetch Account Details button
+        frm.add_custom_button(__('Fetch Account Details'), function() {
+            frappe.call({
+                method: 'gocardless_banking.gocardless_banking.doctype.gocardless_banking_account.gocardless_banking_account.fetch_account_details',
+                args: {
+                    gocardless_banking_account_name: frm.doc.name
+                },
+                freeze: true,
+                freeze_message: __('Fetching Account Details...'),
+                callback: function(r) {
+                    if (!r.exc) {
+                        frm.reload_doc();
+                    }
+                }
+            });
+        });
     }
 });
 
