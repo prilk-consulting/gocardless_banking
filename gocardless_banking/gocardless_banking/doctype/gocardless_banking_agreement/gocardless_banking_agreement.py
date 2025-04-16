@@ -29,6 +29,9 @@ def create_gocardless_requisition(agreement_name, institution_id, agreement_id):
     if not redirect_url:
         redirect_url = f"{frappe.utils.get_url()}/api/method/gocardless_banking.api.handle_auth_redirect"
 
+    # Add source parameter to redirect URL
+    redirect_url = f"{redirect_url}?source=settings"
+
     if not access_key or not redirect_url:
         frappe.throw(frappe._("Missing access token or redirect URL in GoCardless Banking Settings."))
 

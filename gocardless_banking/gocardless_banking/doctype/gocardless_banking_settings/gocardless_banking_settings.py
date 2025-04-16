@@ -116,13 +116,18 @@ def create_gocardless_banking_agreement(gocardless_banking_settings_name,institu
     if response.status_code == 201:
         # Parse the response to get the agreement data
         agreement_data = response.json()  
-        update_gocardless_banking_agreement(
+        agreement_result = update_gocardless_banking_agreement(
             gocardless_banking_settings = gocardless_banking_settings,
             bank_name = bank_name,
             agreement_data=agreement_data
         )
-        # Return a success message
-        return {"message": "Agreement successfully created."}
+        # Return a success message with Frappe document details
+        return {
+            "bank_id": agreement_data.get("institution_id"),
+            "agreement_name": agreement_result.get("agreementname"),  # Use the agreement name from result
+            "agreement_id": agreement_result.get("agreement_id"),  # Use the agreement ID from result
+            "message": "Agreement successfully created."
+        }
     else:
         frappe.throw(f"Failed to create agreement. Status Code: {response.status_code}, Response: {response.text}")
 
@@ -170,9 +175,12 @@ def update_gocardless_banking_agreement(gocardless_banking_settings, bank_name, 
         })
         agreement_doc.insert()
         message = "GoCardless Banking Agreement created successfully"
-
-    return {"message": message}
-
+    return {
+        "message": "Agreement successfully created.",
+        "agreementname": agreement_doc.name,  
+        "agreement_id": agreement_doc.agreement_id,
+        "bank_id": agreement_doc.bank_id
+    }
 
 @frappe.whitelist()
 def refresh_gocardless_keys(gocardless_banking_settings_name):
