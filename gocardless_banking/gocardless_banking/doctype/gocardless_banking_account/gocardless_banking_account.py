@@ -184,6 +184,8 @@ def create_transaction(gocardless_banking_account_name, transaction_data, transa
     
     # Insert the transaction record into the database
     bank_transaction.insert()
+    # Submit the bank transaction
+    bank_transaction.submit()
 
 def scheduled_fetch_transactions():
     gocardless_banking_accounts = frappe.get_all("GoCardless Banking Account", filters={"automatic_sync": 1}, fields=["name"])
