@@ -8,7 +8,7 @@
 
 **GoCardless Banking Integration** is a powerful Frappe/ERPNext app that connects your bank accounts to ERPNext, enabling seamless financial management. With support for over **2,500 banks** across the UK and Europe, this app automates transaction fetching, account synchronization, and balance tracking, saving you time and ensuring accuracy.
 
-> **Note**: This integration requires a GoCardless subscription. Visit [GoCardless Bank Account Data](https://gocardless.com/bank-account-data/) for pricing and sign-up details.
+> **Note**: This integration requires a GoCardless subscription. Visit [GoCardless Bank Account Data](https://gocardless.com/bank-account-data/) for pricing and sign-up details. As of now, Gocardless provides a free subscription £/€0 per month with a limit of Up to 50 bank connections per month
 
 ---
 
