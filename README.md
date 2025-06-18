@@ -3,7 +3,6 @@
 	<h2>Prilk Consulting BV</h2>
    <h3>GoCardless Banking Integration</h3>
 </div>
----
 
 ## Overview
 
