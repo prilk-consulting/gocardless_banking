@@ -1,6 +1,7 @@
 <div align="center">
 	<img src="https://avatars.githubusercontent.com/u/118217131?s=400&u=c795a6f774a4427c644c398a4d6a83ce4430c74d&v=4" height="80">
-	<h2>Prilk Consulting BV/h2>
+	<h2>Prilk Consulting BV</h2>
+   <h3>GoCardless Banking Integration</h3>
 </div>
 
 <div align="center">
