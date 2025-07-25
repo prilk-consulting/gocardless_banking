@@ -1,14 +1,14 @@
 <div align="center">
 	<img src="https://avatars.githubusercontent.com/u/118217131?s=400&u=c795a6f774a4427c644c398a4d6a83ce4430c74d&v=4" height="80">
 	<h2>Prilk Consulting BV</h2>
-   <h3>GoCardless Banking Integration</h3>
+   <h3>GoCardless Banking Integration with ERPNext</h3>
 </div>
 
 ## Overview
 
-**GoCardless Banking Integration** is a powerful Frappe/ERPNext app that connects your bank accounts to ERPNext, enabling seamless financial management. With support for over **2,500 banks** across the UK and Europe, this app automates transaction fetching, account synchronization, and balance tracking, saving you time and ensuring accuracy.
+**GoCardless Banking Integration** is a powerful Frappe/ERPNext app that connects your bank accounts to ERPNext, enabling seamless financial management. With support for over **2,500 banks** across UK and EU (European Union), this app automates transaction fetching, account synchronization, and balance tracking, saving you time and ensuring accuracy.
 
-> **Note**: This integration requires a GoCardless subscription. Visit [GoCardless Bank Account Data](https://gocardless.com/bank-account-data/) for pricing and sign-up details. As of now, Gocardless provides a free subscription £/€0 per month with a limit of Up to 50 bank connections per month
+> **Note**: This integration requires a GoCardless subscription. Visit [GoCardless Bank Account Data](https://gocardless.com/bank-account-data/) for pricing and sign-up details. As of July 2025, Gocardless provides a free subscription £/€0 per month with a limit of Up to 50 bank connections per month.
 
 ---
 
@@ -16,18 +16,17 @@
 
 ### 🏦 Bank Account Integration
 
-- Connect multiple GoCardless bank accounts
-- Secure OAuth-based authentication
-- Automatic synchronization of account data
-- Bank account verification
+- Connect multiple GoCardless accounts
 - Support for multiple bank connections
+- Automatic synchronization of account data
+- Secure authentication with GoCardless.
+- Bank account verification via GoCardless
 
 ### 💸 Transaction Management
 
-- Daily and manual transaction synchronization
+- Daily automated and manual transaction synchronization
 - Detailed transaction history
-- Real-time account balance tracking
-- Transaction categorization for better insights
+- Account balance auto update.
 
 ### 🔒 Security & Compliance
 
@@ -42,7 +41,7 @@
 
 Follow these steps to install the GoCardless Banking Integration app on your Frappe/ERPNext instance.
 
-1. **Install the app** in your Frappe bench:
+1. **Install the app** in your Frappe bench or via Frappecloud:
 
    ```bash
    bench get-app https://github.com/prilk-consulting/gocardless_banking
@@ -54,67 +53,54 @@ Follow these steps to install the GoCardless Banking Integration app on your Fra
    bench --site [your-site-name] install-app gocardless_banking
    ```
 
-3. **Configure GoCardless API credentials** in the app settings (see Configuration).
-
 ---
 
 ## Configuration
 
-### 1. API Setup
+### 1. GoCardless Banking Account Set up
 
 - Obtain GoCardless API credentials from GoCardless.
 - Add credentials to the app settings in ERPNext.
-- Configure webhook endpoints for real-time updates.
-- Set environment variables for secure operation.
+- Activate Gocardless Account in the app.
 
-### 2. Bank Account Settings
+### 2. Add Bank Accounts
 
-- Select supported banks from the list of 2,500+ institutions.
-- Configure account verification settings.
-- Define synchronization preferences (e.g., daily or manual).
+- Select your bank from the list of banks.
+- Verify Bank account credentials via GoCardless.
+- Link ERPNext Bank Account to GoCardless Bank Account.
+- Enable Automated sync if required.
 
 ---
 
 ## Usage
 
-### Setting Up Bank Accounts
-
-1. Create a banking agreement in ERPNext.
-2. Connect your bank accounts via the secure GoCardless authentication flow.
-3. Verify account access and monitor connection status.
-
 ### Managing Transactions
 
-- View and filter transaction history.
-- Monitor real-time account balances.
-- Track synchronization status and resolve any issues.
-- Generate financial reports for better decision-making.
+- Fetch Transactions automatically or manually.
+- View and filter transaction history via ERPNext Bank Transaction document.
+- Check account balances and Track synchronization status.
 
 ---
 
-## API Integration
 
-The app integrates with the GoCardless Banking API to provide:
+## Upcoming Features
 
-- Real-time bank account data retrieval
-- Automated transaction synchronization
-- Secure account verification
-- Continuous balance updates
+- Integration with Advanced Bank Reconciliation
+- Alerts and monitoring
+- Analytics and Reporting
 
 ---
 
-## Security
+## Support and Feature Request
 
-We prioritize your data security with:
+For assistance, please:
 
-- **Encrypted Storage**: API keys and bank account details are securely encrypted.
-- **GDPR Compliance**: Full adherence to data protection regulations.
-- **Regular Audits**: Ongoing security reviews to ensure robustness.
-- **Key Rotation**: Periodic updates to API keys for added protection.
+- Open an issue on the GitHub repository.
+- Contact the Prilk Consulting team at [Support page](https://www.prilk.com/contact).
 
 ---
 
-## Contributing
+## Contribution
 
 We welcome contributions to enhance the GoCardless Banking Integration app! To contribute:
 
@@ -134,19 +120,9 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 ---
 
-## Support
-
-For assistance, please:
-
-- Open an issue on the GitHub repository.
-- Contact the Prilk Consulting BV team at support@prilk.com.
-- Refer to the documentation for troubleshooting.
-
----
-
 ## Credits
 
-Developed with ❤️ by Prilk Consulting BV.
+Developed by Prilk Consulting BV.
 
 ### Acknowledgments
 
