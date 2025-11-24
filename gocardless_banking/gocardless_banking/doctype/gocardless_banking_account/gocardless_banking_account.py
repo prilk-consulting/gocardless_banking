@@ -137,14 +137,8 @@ def create_bank_transactions(gocardless_banking_account_name, transactions):
 def create_transaction(gocardless_banking_account_name, transaction_data, transaction_type):
     # Fetch the GoCardless Banking Account document
     gocardless_banking_account = frappe.get_doc("GoCardless Banking Account", gocardless_banking_account_name)
-    # # Check if a Bank Transaction with this transactionId already exists
-    # transaction_id = transaction_data.get("transactionId")
-    # if transaction_id and frappe.get_value("Bank Transaction", {"transaction_id": transaction_id}, "name"):
-    #     # Skip this transaction if it already exists
-    #     frappe.log_error(f"Skipping duplicate transaction with ID: {transaction_id}", "gocardless Transaction Import")
-    #     return None  # Return None to indicate the transaction was skipped
     
-    # Use internalTransactionId as the primary unique identifier (always present)
+    # Use internalTransactionId as primary unique identifier
     internal_transaction_id = transaction_data.get("internalTransactionId")  
     if not internal_transaction_id:
         frappe.log_error(
@@ -153,16 +147,22 @@ def create_transaction(gocardless_banking_account_name, transaction_data, transa
         )
         return None
     
+    # Check if a Bank Transaction with this transactionId already exists (To be extra sure)
+    transaction_id = transaction_data.get("transactionId")
+    if transaction_id and frappe.get_value("Bank Transaction", {"transaction_id": transaction_id}, "name"):
+        frappe.log_error(f"Skipping duplicate transaction with ID: {transaction_id}", "gocardless Transaction Import")
+        return None  # Return None to indicate the transaction was skipped  
+    
     # Check if transaction already exists
-    if frappe.get_value("Bank Transaction", {"internalTransactionId": internal_transaction_id}, "name"):
-        return None  # Silently skip duplicates
+    if frappe.get_value("Bank Transaction", {"transaction_id": internal_transaction_id}, "name"):
+        return None  # Skip duplicates
     
     # Create a new Bank Transaction document
     bank_transaction = frappe.new_doc("Bank Transaction")
     
     # Assign values to the transaction fields
     bank_transaction.bank_account = gocardless_banking_account.bank_account
-    bank_transaction.transaction_id = transaction_data.get("transactionId")
+    bank_transaction.transaction_id = internal_transaction_id
     # bank_transaction.debtor_name = transaction_data.get("debtorName")
 
     # Get the transaction amount and determine if it's a deposit or withdrawal
