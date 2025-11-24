@@ -137,12 +137,25 @@ def create_bank_transactions(gocardless_banking_account_name, transactions):
 def create_transaction(gocardless_banking_account_name, transaction_data, transaction_type):
     # Fetch the GoCardless Banking Account document
     gocardless_banking_account = frappe.get_doc("GoCardless Banking Account", gocardless_banking_account_name)
-    # Check if a Bank Transaction with this transactionId already exists
-    transaction_id = transaction_data.get("transactionId")
-    if transaction_id and frappe.get_value("Bank Transaction", {"transaction_id": transaction_id}, "name"):
-        # Skip this transaction if it already exists
-        frappe.log_error(f"Skipping duplicate transaction with ID: {transaction_id}", "gocardless Transaction Import")
-        return None  # Return None to indicate the transaction was skipped
+    # # Check if a Bank Transaction with this transactionId already exists
+    # transaction_id = transaction_data.get("transactionId")
+    # if transaction_id and frappe.get_value("Bank Transaction", {"transaction_id": transaction_id}, "name"):
+    #     # Skip this transaction if it already exists
+    #     frappe.log_error(f"Skipping duplicate transaction with ID: {transaction_id}", "gocardless Transaction Import")
+    #     return None  # Return None to indicate the transaction was skipped
+    
+    # Use internalTransactionId as the primary unique identifier (always present)
+    internal_transaction_id = transaction_data.get("internalTransactionId")  
+    if not internal_transaction_id:
+        frappe.log_error(
+            f"Transaction missing internalTransactionId: {json.dumps(transaction_data)}", 
+            "GoCardless Transaction Import"
+        )
+        return None
+    
+    # Check if transaction already exists
+    if frappe.get_value("Bank Transaction", {"internalTransactionId": internal_transaction_id}, "name"):
+        return None  # Silently skip duplicates
     
     # Create a new Bank Transaction document
     bank_transaction = frappe.new_doc("Bank Transaction")
