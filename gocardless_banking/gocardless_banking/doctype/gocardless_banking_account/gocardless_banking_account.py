@@ -138,12 +138,13 @@ def create_transaction(gocardless_banking_account_name, transaction_data, transa
     # Fetch the GoCardless Banking Account document
     gocardless_banking_account = frappe.get_doc("GoCardless Banking Account", gocardless_banking_account_name)
     
-    # Use internalTransactionId as primary unique identifier
-    internal_transaction_id = transaction_data.get("internalTransactionId")  
+    # Use internalTransactionId as primary unique identifier, fallback to transactionId
+    internal_transaction_id = transaction_data.get("internalTransactionId") or transaction_data.get("transactionId")
     if not internal_transaction_id:
+        error_title = "Transaction missing both internalTransactionId and transactionId"
         frappe.log_error(
-            f"Transaction missing internalTransactionId: {json.dumps(transaction_data)}", 
-            "GoCardless Transaction Import"
+            message=json.dumps(transaction_data, indent=4),
+            title=error_title
         )
         return None
     
