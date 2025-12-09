@@ -148,12 +148,6 @@ def create_transaction(gocardless_banking_account_name, transaction_data, transa
         )
         return None
     
-    # Check if a Bank Transaction with this transactionId already exists (To be extra sure)
-    transaction_id = transaction_data.get("transactionId")
-    if transaction_id and frappe.get_value("Bank Transaction", {"transaction_id": transaction_id}, "name"):
-        frappe.log_error(f"Skipping duplicate transaction with ID: {transaction_id}", "gocardless Transaction Import")
-        return None  # Return None to indicate the transaction was skipped  
-    
     # Check if transaction already exists
     if frappe.get_value("Bank Transaction", {"transaction_id": internal_transaction_id}, "name"):
         return None  # Skip duplicates
