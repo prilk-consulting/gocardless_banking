@@ -137,19 +137,28 @@ def create_bank_transactions(gocardless_banking_account_name, transactions):
 def create_transaction(gocardless_banking_account_name, transaction_data, transaction_type):
     # Fetch the GoCardless Banking Account document
     gocardless_banking_account = frappe.get_doc("GoCardless Banking Account", gocardless_banking_account_name)
-    # Check if a Bank Transaction with this transactionId already exists
+
+    # Get both IDs from GoCardless for deduplication
     transaction_id = transaction_data.get("transactionId")
-    if transaction_id and frappe.get_value("Bank Transaction", {"transaction_id": transaction_id}, "name"):
-        # Skip this transaction if it already exists
-        frappe.log_error(f"Skipping duplicate transaction with ID: {transaction_id}", "gocardless Transaction Import")
-        return None  # Return None to indicate the transaction was skipped
-    
+    internal_transaction_id = transaction_data.get("internalTransactionId")
+
+    # Check if EITHER ID already exists in the database
+    existing = None
+    if transaction_id:
+        existing = frappe.get_value("Bank Transaction", {"transaction_id": transaction_id}, "name")
+    if not existing and internal_transaction_id:
+        existing = frappe.get_value("Bank Transaction", {"transaction_id": internal_transaction_id}, "name")
+
+    if existing:
+        return None  # Skip duplicate transaction
+
     # Create a new Bank Transaction document
     bank_transaction = frappe.new_doc("Bank Transaction")
-    
+
     # Assign values to the transaction fields
+    # Prefer bank's transactionId, fallback to GoCardless internalTransactionId
     bank_transaction.bank_account = gocardless_banking_account.bank_account
-    bank_transaction.transaction_id = transaction_data.get("transactionId")
+    bank_transaction.transaction_id = transaction_id or internal_transaction_id
     # bank_transaction.debtor_name = transaction_data.get("debtorName")
 
     # Get the transaction amount and determine if it's a deposit or withdrawal
@@ -191,3 +200,95 @@ def scheduled_fetch_transactions():
     gocardless_banking_accounts = frappe.get_all("GoCardless Banking Account", filters={"automatic_sync": 1}, fields=["name"])
     for gocardless_banking_account in gocardless_banking_accounts:
         fetch_transactions(gocardless_banking_account.name)
+
+
+@frappe.whitelist()
+def remove_duplicate_transactions(gocardless_banking_account_name):
+    """
+    Remove duplicate Bank Transactions for a GoCardless Banking Account.
+
+    - Parses the description JSON to extract transactionId and internalTransactionId
+    - Updates transaction_id field (prefer transactionId, fallback to internalTransactionId)
+    - Removes duplicates (keeps the oldest one)
+    - Skips reconciled transactions
+    """
+    gocardless_banking_account = frappe.get_doc("GoCardless Banking Account", gocardless_banking_account_name)
+
+    if not gocardless_banking_account.bank_account:
+        frappe.throw("No Bank Account linked to this GoCardless Banking Account.")
+
+    # Get all non-reconciled Bank Transactions for this bank account
+    transactions = frappe.get_all(
+        "Bank Transaction",
+        filters={
+            "bank_account": gocardless_banking_account.bank_account,
+            "status": ["!=", "Reconciled"],
+            "docstatus": ["!=", 2],  # Exclude cancelled
+        },
+        fields=["name", "description", "transaction_id", "creation"],
+        order_by="creation asc"
+    )
+
+    # Track seen IDs and duplicates
+    seen_ids = {}  # id -> first transaction name
+    duplicates_to_delete = []
+    updated_count = 0
+
+    for txn in transactions:
+        # Parse the description JSON to extract GoCardless IDs
+        transaction_id = None
+        internal_transaction_id = None
+
+        if txn.description:
+            try:
+                data = json.loads(txn.description)
+                transaction_id = data.get("transactionId")
+                internal_transaction_id = data.get("internalTransactionId")
+            except (json.JSONDecodeError, TypeError):
+                # Not a JSON description, skip
+                continue
+
+        # Determine the ID to use (prefer transactionId, fallback to internalTransactionId)
+        id_to_use = transaction_id or internal_transaction_id
+
+        if not id_to_use:
+            continue
+
+        # Check if we've seen this ID before
+        if id_to_use in seen_ids:
+            # This is a duplicate - mark for deletion
+            duplicates_to_delete.append(txn.name)
+        elif transaction_id and internal_transaction_id:
+            # Check if internal_transaction_id was seen (edge case)
+            if internal_transaction_id in seen_ids:
+                duplicates_to_delete.append(txn.name)
+            else:
+                seen_ids[id_to_use] = txn.name
+                seen_ids[internal_transaction_id] = txn.name  # Track both
+        else:
+            seen_ids[id_to_use] = txn.name
+
+        # Update transaction_id if it differs from what we calculated
+        if txn.name not in duplicates_to_delete and txn.transaction_id != id_to_use:
+            frappe.db.set_value("Bank Transaction", txn.name, "transaction_id", id_to_use, update_modified=False)
+            updated_count += 1
+
+    # Delete duplicates (cancel first if submitted)
+    deleted_count = 0
+    for txn_name in duplicates_to_delete:
+        try:
+            doc = frappe.get_doc("Bank Transaction", txn_name)
+            if doc.docstatus == 1:  # Submitted
+                doc.cancel()
+            doc.delete()
+            deleted_count += 1
+        except Exception as e:
+            frappe.log_error(f"Failed to delete duplicate transaction {txn_name}: {str(e)}", "Remove Duplicates Error")
+
+    frappe.db.commit()
+
+    return {
+        "updated": updated_count,
+        "deleted": deleted_count,
+        "total_processed": len(transactions)
+    }

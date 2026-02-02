@@ -40,6 +40,35 @@ frappe.ui.form.on('GoCardless Banking Account', {
                 }
             });
         });
+
+        // Add Remove Duplicates button if bank account is linked
+        if (frm.doc.bank_account) {
+            frm.add_custom_button(__('Remove Duplicates'), function() {
+                frappe.confirm(
+                    __('This will remove duplicate Bank Transactions (excluding reconciled ones). Continue?'),
+                    function() {
+                        frappe.call({
+                            method: 'gocardless_banking.gocardless_banking.doctype.gocardless_banking_account.gocardless_banking_account.remove_duplicate_transactions',
+                            args: {
+                                gocardless_banking_account_name: frm.doc.name
+                            },
+                            freeze: true,
+                            freeze_message: __('Removing duplicate transactions...'),
+                            callback: function(r) {
+                                if (r.message) {
+                                    frappe.msgprint({
+                                        title: __('Duplicates Removed'),
+                                        message: __('Processed: {0}<br>Updated: {1}<br>Deleted: {2}',
+                                            [r.message.total_processed, r.message.updated, r.message.deleted]),
+                                        indicator: 'green'
+                                    });
+                                }
+                            }
+                        });
+                    }
+                );
+            }, __('Actions'));
+        }
     }
 });
 
